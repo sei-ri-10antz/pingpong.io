@@ -56,10 +56,10 @@ func (s *Server) Ping(ctx context.Context, req *protos.Request) (*protos.Respons
 		if err != nil {
 			return nil, err
 		}
-		// s.log.Printf("Published [%s]: %s", subj, payload)
-		// s.log.Printf("Received [%s]: %s", msg.Subject, string(msg.Data))
+		s.log.Printf("Published [%s]: %s", subj, payload)
+		s.log.Printf("Received [%s]: %s", msg.Subject, string(msg.Data))
 		resp = &protos.Response{
-			Result: fmt.Sprintf("[%s] %s!", s.Name, string(msg.Data)),
+			Result: fmt.Sprintf("[%s] %s!", msg.Subject, string(msg.Data)),
 		}
 	case protos.Request_client:
 		conn, err := grpc.Dial(s.ServiceAddr, grpc.WithInsecure())
@@ -90,6 +90,7 @@ func (s *Server) Serve(ctx context.Context) {
 		s.log.Fatal(err)
 	} else {
 		s.eventbus = v
+		s.log.Println("nats-streaming connected at ", s.NatsURL)
 	}
 
 	subj := fmt.Sprintf("%s.%s", s.ServiceName, Topic)
