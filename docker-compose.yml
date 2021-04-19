@@ -1,0 +1,59 @@
+version: "3.1"
+
+services:
+  nats:
+    image: nats
+    container_name: nats
+    ports:
+      - 8222:8222
+      - 4222:4222
+    networks:
+      - sandbox-net
+
+  api-server:
+    container_name: api
+    build: ./api
+    environment: 
+      PORT: 3000
+      PING_SERVER_ADDR: 10010
+      PING2_SERVER_ADDR: 10011
+    ports: 
+      - 3000:3000
+    restart: always
+    depends_on:
+      - ping-service
+      - ping2-service
+    networks: 
+      - sandbox-net
+
+  ping-service:
+    container_name: ping
+    build: ./ping
+    environment:
+      NAME: Service-A
+      PORT: 10010
+      SERVICE_NAME: Service-B
+      SERVICE_ADDR: 10011
+    ports:
+      - 10010:10010
+    restart: always
+    networks:
+      - sandbox-net
+
+  ping2-service:
+    container_name: ping2
+    build: ./ping
+    environment:
+      NAME: Service-B
+      PORT: 10011
+      SERVICE_NAME: Service-A
+      SERVICE_ADDR: 10010
+    ports:
+      - 10011:10011
+    restart: always
+    networks:
+      - sandbox-net
+
+networks:
+  sandbox-net:
+    external: true

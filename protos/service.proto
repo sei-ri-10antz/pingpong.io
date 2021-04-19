@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package protos;
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option go_package = "github.com/sei-ri/pingpong.io/protos";
+
+// define swagger api
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  swagger: "2.0";
+  info: {
+      title: "Stub GATEWAY APIS";
+      description: "token based openapis";
+      version: "1.0";
+  }
+  schemes: [HTTP, HTTPS]
+  consumes: "application/json"
+  produces: "application/json"
+};
+
+service Service {
+  rpc Ping (Request) returns (Response) {
+    option (google.api.http) = {
+      get: "/ping/{path}"
+    };
+  }
+}
+
+message Request {
+  enum Path {
+    none = 0;
+    nats = 1;
+    client = 2;
+  }
+  Path path = 1;
+}
+
+message Response {
+  string result = 1;
+}
